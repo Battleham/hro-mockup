@@ -9,9 +9,9 @@ import {
 	Redirect
 } from "react-router-dom";
 import Dashboard from "./components/pages/Dashboard";
-import Route2 from "./components/pages/Route2";
 import Login from "./components/pages/LogIn";
 import Leads from "./components/pages/Leads";
+import Users from "./components/pages/Users";
 
 const theme = createMuiTheme({
 	palette: {
@@ -153,9 +153,14 @@ function App() {
 								/>
 								<Route
 									exact
-									path="/2"
+									path="/users"
 									render={props => (
-										<Route2 {...props} setPageName={setPageName} />
+										<Users
+											{...props}
+											setPageName={setPageName}
+											user={loggedInUser}
+											users={mockData.users}
+										/>
 									)}
 								/>
 								<Route

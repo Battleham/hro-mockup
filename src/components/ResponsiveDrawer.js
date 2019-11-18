@@ -125,7 +125,7 @@ function ResponsiveDrawer(props) {
 					<ListItem
 						button
 						onClick={() => setMobileOpen(false)}
-						component={props => <Link to="/2" {...props} />}
+						component={props => <Link to="/users" {...props} />}
 					>
 						<ListItemIcon>
 							<PeopleAltIcon />
