@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 
-const LogIn = ({ setUser, users, setPageName }) => {
+const LogIn = props => {
+	const { data, setUser, setPageName } = props;
+	const { users } = data;
 	setPageName("Login");
-
 	const [login, setLoginInfo] = useState({
 		username: "",
 		password: "",
@@ -70,7 +71,14 @@ const LogIn = ({ setUser, users, setPageName }) => {
 		if (!!me) {
 			login.errors = `Successfully logged in as ${login.username}`;
 			setLoginInfo({ ...login, visibility: "visible" });
-			setUser(me);
+
+			const viewableLeads =
+				me.usergroup === "exec"
+					? data.leads
+					: data.leads.filter(lead => {
+							return lead.agent === me.username;
+					  });
+			setUser({ ...me, myLeads: viewableLeads });
 			return <Redirect to="/" />;
 		} else {
 			login.errors = "Username or password is incorrect";

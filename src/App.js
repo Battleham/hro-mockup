@@ -8,10 +8,10 @@ import {
 	Switch,
 	Redirect
 } from "react-router-dom";
-import Home from "./components/pages/Home";
-import Route1 from "./components/pages/Route1";
+import Dashboard from "./components/pages/Dashboard";
 import Route2 from "./components/pages/Route2";
 import Login from "./components/pages/LogIn";
+import Leads from "./components/pages/Leads";
 
 const theme = createMuiTheme({
 	palette: {
@@ -47,7 +47,9 @@ const mockData = {
 			type: "b2c",
 			email: "clarkkent@gmail.com",
 			assigned: true,
-			agent: "meghan"
+			agent: "meghan",
+			source: "twitter",
+			date: "11-01-2019"
 		},
 		{
 			name: "Louis Lane",
@@ -55,7 +57,9 @@ const mockData = {
 			type: "b2c",
 			email: "louis@gmail.com",
 			assigned: true,
-			agent: "meghan"
+			agent: "meghan",
+			source: "facebook",
+			date: "11-08-2019"
 		},
 		{
 			name: "Bruce Wayne",
@@ -63,28 +67,36 @@ const mockData = {
 			type: "b2c",
 			email: "darkknight@gmail.com",
 			assigned: true,
-			agent: "lillian"
+			agent: "lillian",
+			source: "instagram",
+			date: "11-03-2019"
 		},
 		{
 			name: "The Joker",
 			phone: "123-456-7890",
 			type: "b2c",
 			email: "jokesonyou@gmail.com",
-			assigned: false
+			assigned: false,
+			source: "linkedin",
+			date: "11-05-2019"
 		},
 		{
 			name: "The Penguin",
 			phone: "123-456-7890",
 			type: "b2c",
 			email: "tuxedoallthetime@gmail.com",
-			assigned: false
+			assigned: false,
+			source: "website",
+			date: "11-11-2019"
 		},
 		{
 			name: "Global News 1",
 			phone: "123-456-7890",
 			type: "b2b",
 			email: "info@globalnews.com",
-			assigned: false
+			assigned: false,
+			source: "call in",
+			date: "11-04-2019"
 		},
 		{
 			name: "Daily Planet",
@@ -92,7 +104,9 @@ const mockData = {
 			type: "b2b",
 			email: "contact@dailyplanet.com",
 			assigned: true,
-			agent: "venessa"
+			agent: "venessa",
+			source: "referral",
+			date: "11-12-2019"
 		}
 	]
 };
@@ -103,28 +117,38 @@ function App() {
 	return (
 		<div>
 			{!loggedInUser ? (
-				<Login
-					setPageName={setPageName}
-					setUser={setUser}
-					users={mockData.users}
-				/>
+				<Login setPageName={setPageName} setUser={setUser} data={mockData} />
 			) : (
 				<Router>
 					<ThemeProvider theme={theme}>
-						<Layout pageName={pageName} user={loggedInUser} setUser={setUser}>
+						<Layout
+							pageName={pageName}
+							user={loggedInUser}
+							setUser={setUser}
+							data={mockData}
+						>
 							<Switch>
 								<Route
 									exact
 									path="/"
 									render={props => (
-										<Home {...props} setPageName={setPageName} />
+										<Dashboard
+											{...props}
+											setPageName={setPageName}
+											user={loggedInUser}
+											data={mockData}
+										/>
 									)}
 								/>
 								<Route
 									exact
-									path="/1"
+									path="/leads"
 									render={props => (
-										<Route1 {...props} setPageName={setPageName} />
+										<Leads
+											{...props}
+											setPageName={setPageName}
+											user={loggedInUser}
+										/>
 									)}
 								/>
 								<Route

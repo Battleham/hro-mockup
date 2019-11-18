@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -7,18 +7,18 @@ import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import MailIcon from "@material-ui/icons/Mail";
 import MenuIcon from "@material-ui/icons/Menu";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import MenuBookIcon from "@material-ui/icons/MenuBook";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import InsertChartIcon from "@material-ui/icons/InsertChart";
 
 const drawerWidth = 240;
 
@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
 	userName: {
 		color: "inherit",
 		fontSize: "1.25rem",
-		marginRight: "10px"
+		marginRight: "20px"
 	}
 }));
 
@@ -71,6 +71,10 @@ function ResponsiveDrawer(props) {
 	const theme = useTheme();
 	const [mobileOpen, setMobileOpen] = React.useState(false);
 
+	const logOut = () => {
+		props.setUser(null);
+		return <Redirect to="/" />;
+	};
 	const handleDrawerToggle = () => {
 		setMobileOpen(!mobileOpen);
 	};
@@ -93,8 +97,21 @@ function ResponsiveDrawer(props) {
 			<List>
 				<ListItem
 					button
-					onClick={handleDrawerToggle}
-					component={props => <Link to="/1" {...props} />}
+					onClick={() => setMobileOpen(false)}
+					component={props => <Link to="/" {...props} />}
+				>
+					<ListItemIcon>
+						<InsertChartIcon />
+					</ListItemIcon>
+					<ListItemText primary="Dashboard" />
+				</ListItem>
+			</List>
+			<Divider />
+			<List>
+				<ListItem
+					button
+					onClick={() => setMobileOpen(false)}
+					component={props => <Link to="/leads" {...props} />}
 				>
 					<ListItemIcon>
 						<MenuBookIcon />
@@ -107,7 +124,7 @@ function ResponsiveDrawer(props) {
 				<List>
 					<ListItem
 						button
-						onClick={handleDrawerToggle}
+						onClick={() => setMobileOpen(false)}
 						component={props => <Link to="/2" {...props} />}
 					>
 						<ListItemIcon>
@@ -149,9 +166,14 @@ function ResponsiveDrawer(props) {
 					{props.user ? (
 						<div>
 							<span className={classes.userName}>{props.user.fullName}</span>
-							<Link to="/logout" logout>
-								Logout
-							</Link>
+							<IconButton
+								color="inherit"
+								aria-label="open drawer"
+								edge="start"
+								onClick={logOut}
+							>
+								<ExitToAppIcon />
+							</IconButton>
 						</div>
 					) : (
 						<Link to="/login">Login</Link>
