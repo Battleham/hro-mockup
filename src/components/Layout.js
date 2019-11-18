@@ -5,7 +5,13 @@ import { Fragment } from "react";
 const Layout = props => {
 	return (
 		<Fragment>
-			<ResponsiveDrawer>{props.children}</ResponsiveDrawer>
+			<ResponsiveDrawer
+				pageName={props.pageName}
+				user={props.user}
+				setUser={props.setUser}
+			>
+				{props.children}
+			</ResponsiveDrawer>
 		</Fragment>
 	);
 };

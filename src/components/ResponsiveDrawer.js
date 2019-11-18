@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -16,6 +17,8 @@ import MenuIcon from "@material-ui/icons/Menu";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
+import MenuBookIcon from "@material-ui/icons/MenuBook";
 
 const drawerWidth = 240;
 
@@ -32,9 +35,10 @@ const useStyles = makeStyles(theme => ({
 	appBar: {
 		[theme.breakpoints.up("sm")]: {
 			width: `calc(100% - ${drawerWidth}px)`,
-			marginLeft: drawerWidth,
-			backgroundColor: "inherit"
-		}
+			marginLeft: drawerWidth
+		},
+
+		backgroundColor: "inherit"
 	},
 	menuButton: {
 		marginRight: theme.spacing(2),
@@ -53,6 +57,11 @@ const useStyles = makeStyles(theme => ({
 	mainBody: {
 		backgroundColor: "#fff",
 		color: "black"
+	},
+	userName: {
+		color: "inherit",
+		fontSize: "1.25rem",
+		marginRight: "10px"
 	}
 }));
 
@@ -68,31 +77,46 @@ function ResponsiveDrawer(props) {
 
 	const drawer = (
 		<div>
-			<div className={classes.toolbar} />
+			<div
+				className={classes.toolbar}
+				style={{
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center"
+				}}
+			>
+				<Typography variant="h6" style={{ color: "red" }}>
+					HRO CRM
+				</Typography>
+			</div>
 			<Divider />
-			<Typography variant="h6">Business Clients</Typography>
 			<List>
-				{["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-					<ListItem button key={text}>
-						<ListItemIcon>
-							{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-						</ListItemIcon>
-						<ListItemText primary={text} />
-					</ListItem>
-				))}
+				<ListItem
+					button
+					onClick={handleDrawerToggle}
+					component={props => <Link to="/1" {...props} />}
+				>
+					<ListItemIcon>
+						<MenuBookIcon />
+					</ListItemIcon>
+					<ListItemText primary="Leads" />
+				</ListItem>
 			</List>
 			<Divider />
-			<Typography variant="h6">Individual Clients</Typography>
-			<List>
-				{["All mail", "Trash", "Spam"].map((text, index) => (
-					<ListItem button key={text}>
+			{props.user.usergroup === "exec" ? (
+				<List>
+					<ListItem
+						button
+						onClick={handleDrawerToggle}
+						component={props => <Link to="/2" {...props} />}
+					>
 						<ListItemIcon>
-							{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+							<PeopleAltIcon />
 						</ListItemIcon>
-						<ListItemText primary={text} />
+						<ListItemText primary="Users" />
 					</ListItem>
-				))}
-			</List>
+				</List>
+			) : null}
 		</div>
 	);
 
@@ -111,9 +135,28 @@ function ResponsiveDrawer(props) {
 						<MenuIcon />
 					</IconButton>
 					<Typography variant="h6" noWrap>
-						HRO CRM
+						{props.pageName}
 					</Typography>
 				</Toolbar>
+				<div
+					style={{
+						position: "absolute",
+						right: "10px",
+						top: "50%",
+						transform: "translateY(-50%)"
+					}}
+				>
+					{props.user ? (
+						<div>
+							<span className={classes.userName}>{props.user.fullName}</span>
+							<Link to="/logout" logout>
+								Logout
+							</Link>
+						</div>
+					) : (
+						<Link to="/login">Login</Link>
+					)}
+				</div>
 			</AppBar>
 			<nav className={classes.drawer} aria-label="mailbox folders">
 				{/* The implementation can be swapped with js to avoid SEO duplication of links. */}
