@@ -68,18 +68,21 @@ const useStyles = makeStyles(theme => ({
 const StyledListItem = withStyles({
 	root: {
 		"&$selected": {
-			backgroundColor: "#21bf74",
+			backgroundColor: "#9fc5c5",
+			color: "#303030",
 			"&:hover": {
-				backgroundColor: "#21bf74"
+				backgroundColor: "#9fc5c5",
+				color: "#303030"
 			}
 		},
 		borderRadius: "5px",
 		marginLeft: "auto",
 		marginRight: "auto",
-		width: "90%",
+		width: "95%",
 
 		"&:hover": {
-			backgroundColor: "#21bf74"
+			backgroundColor: "#9fc5c5",
+			color: "#303030"
 		}
 	},
 	selected: {}
@@ -112,7 +115,6 @@ function ResponsiveDrawer(props) {
 			>
 				<Typography variant="h6">HRO CRM</Typography>
 			</div>
-			<Divider />
 			<List>
 				<StyledListItem
 					dense
@@ -128,7 +130,6 @@ function ResponsiveDrawer(props) {
 					<ListItemText primary="Dashboard" />
 				</StyledListItem>
 			</List>
-
 			<List>
 				<StyledListItem
 					dense
