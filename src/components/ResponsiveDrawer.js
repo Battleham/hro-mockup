@@ -75,10 +75,6 @@ const StyledListItem = withStyles({
 				color: "#303030"
 			}
 		},
-		borderRadius: "5px",
-		marginLeft: "auto",
-		marginRight: "auto",
-		width: "95%",
 
 		"&:hover": {
 			backgroundColor: "#9fc5c5",
@@ -129,8 +125,6 @@ function ResponsiveDrawer(props) {
 					</ListItemIcon>
 					<ListItemText primary="Dashboard" />
 				</StyledListItem>
-			</List>
-			<List>
 				<StyledListItem
 					dense
 					button
