@@ -12,10 +12,39 @@ import Dashboard from "./components/pages/Dashboard";
 import Login from "./components/pages/LogIn";
 import Leads from "./components/pages/Leads";
 import Users from "./components/pages/Users";
+import ApolloClient from "apollo-boost";
+import gql from "graphql-tag";
+
+const apolloClient = new ApolloClient({
+	uri: "http://134.122.22.200/graphql"
+});
+
+const roleId = 2;
+
+apolloClient
+	.query({
+		query: gql`
+			query {
+				role(id: ${roleId}) {
+					name
+					description
+					permissions {
+						name
+						description
+					}
+				}
+			}
+		`
+	})
+	.then(result => console.log(result));
 
 const theme = createMuiTheme({
 	palette: {
-		type: "dark"
+		type: "dark",
+		background: {
+			default: "#303030",
+			paper: "#545454"
+		}
 	}
 });
 

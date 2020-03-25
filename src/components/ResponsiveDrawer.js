@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Link, Redirect, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -14,7 +14,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import MenuIcon from "@material-ui/icons/Menu";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles, useTheme, withStyles } from "@material-ui/core/styles";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import MenuBookIcon from "@material-ui/icons/MenuBook";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme => ({
 	},
 	content: {
 		flexGrow: 1,
-		padding: theme.spacing(3)
+		padding: theme.spacing(1)
 	},
 	mainBody: {
 		backgroundColor: "#fff",
@@ -64,11 +64,32 @@ const useStyles = makeStyles(theme => ({
 		marginRight: "20px"
 	}
 }));
+//"#21bf74"
+const StyledListItem = withStyles({
+	root: {
+		"&$selected": {
+			backgroundColor: "#21bf74",
+			"&:hover": {
+				backgroundColor: "#21bf74"
+			}
+		},
+		borderRadius: "5px",
+		marginLeft: "auto",
+		marginRight: "auto",
+		width: "90%",
+
+		"&:hover": {
+			backgroundColor: "#21bf74"
+		}
+	},
+	selected: {}
+})(ListItem);
 
 function ResponsiveDrawer(props) {
 	const { container } = props;
 	const classes = useStyles();
 	const theme = useTheme();
+	const location = useLocation();
 	const [mobileOpen, setMobileOpen] = React.useState(false);
 
 	const logOut = () => {
@@ -89,49 +110,52 @@ function ResponsiveDrawer(props) {
 					alignItems: "center"
 				}}
 			>
-				<Typography variant="h6" style={{ color: "red" }}>
-					HRO CRM
-				</Typography>
+				<Typography variant="h6">HRO CRM</Typography>
 			</div>
 			<Divider />
 			<List>
-				<ListItem
+				<StyledListItem
+					dense
 					button
 					onClick={() => setMobileOpen(false)}
 					component={props => <Link to="/" {...props} />}
+					selected={location.pathname === "/"}
+					ContainerComponent="li"
 				>
-					<ListItemIcon>
+					<ListItemIcon style={{ color: "inherit" }}>
 						<InsertChartIcon />
 					</ListItemIcon>
 					<ListItemText primary="Dashboard" />
-				</ListItem>
+				</StyledListItem>
 			</List>
-			<Divider />
+
 			<List>
-				<ListItem
+				<StyledListItem
+					dense
 					button
 					onClick={() => setMobileOpen(false)}
 					component={props => <Link to="/leads" {...props} />}
+					selected={location.pathname === "/leads"}
 				>
-					<ListItemIcon>
+					<ListItemIcon style={{ color: "inherit" }}>
 						<MenuBookIcon />
 					</ListItemIcon>
 					<ListItemText primary="Leads" />
-				</ListItem>
+				</StyledListItem>
 			</List>
-			<Divider />
 			{props.user.usergroup === "exec" ? (
 				<List>
-					<ListItem
+					<StyledListItem
 						button
 						onClick={() => setMobileOpen(false)}
 						component={props => <Link to="/users" {...props} />}
+						selected={location.pathname === "/users"}
 					>
 						<ListItemIcon>
 							<PeopleAltIcon />
 						</ListItemIcon>
 						<ListItemText primary="Users" />
-					</ListItem>
+					</StyledListItem>
 				</List>
 			) : null}
 		</div>
