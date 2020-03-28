@@ -1,16 +1,75 @@
 import React, { useState } from "react";
+//import { Redirect } from "react-router-dom";
+import { useMutation, useQuery, useApolloClient } from "@apollo/react-hooks";
+import { gql } from "apollo-boost";
 import { Redirect } from "react-router-dom";
 
-const LogIn = props => {
-	const { data, setUser, setPageName } = props;
-	const { users } = data;
-	setPageName("Login");
-	const [login, setLoginInfo] = useState({
-		username: "",
+const LOG_IN = gql`
+	mutation LogIn($email: String!, $password: String!) {
+		login(email: $email, password: $password) {
+			name
+			email
+			role {
+				name
+			}
+			permissions {
+				name
+			}
+		}
+	}
+`;
+
+const ADD_LOCAL_USER = gql`
+	mutation AddLocalUser($user: LocalUserInput!) {
+		addLocalUser(user: $user) @client
+	}
+`;
+
+const getLoggedInUser = gql`
+	query LoggedInUser {
+		user @client {
+			name
+			email
+			permissions {
+				name
+			}
+		}
+	}
+`;
+
+const LogIn = () => {
+	const client = useApolloClient();
+
+	const [loginInfo, setLoginInfo] = useState({
+		email: "",
 		password: "",
 		errors: "No errors",
-		visibility: "hidden"
+		visibility: "hidden",
+		loggedIn: false
 	});
+
+	const [logIn, { data, loading, error, called }] = useMutation(LOG_IN);
+	const [addLocalUser] = useMutation(ADD_LOCAL_USER);
+	const { data: localUserData } = useQuery(getLoggedInUser);
+
+	// if (called && !loading && data && !loginInfo.loggedIn) {
+	// 	if (data.login) {
+	// 		setLoginInfo({ ...loginInfo, loggedIn: true });
+	// 		const { name, email: userEmail, role, permissions } = data.login;
+	// 		let user = {
+	// 			name,
+	// 			email: userEmail,
+	// 			role: role.name,
+	// 			permissions: permissions.map(p => p.name),
+	// 			__typename: "LocalUser"
+	// 		};
+	// 		console.log(user);
+	// 		addLocalUser({ variables: { user } });
+	// 	}
+	// }
+	// if (error) {
+	// 	console.log(error);
+	// }
 
 	const styles = {
 		elementSize: {
@@ -33,7 +92,7 @@ const LogIn = props => {
 			color: "white",
 			fontWeight: "bold",
 			paddingLeft: "3px",
-			visibility: login.visibility
+			visibility: loginInfo.visibility
 		},
 		loginForm: {
 			border: "2px solid black",
@@ -52,39 +111,17 @@ const LogIn = props => {
 		}
 	};
 
-	const { username, password } = login;
+	const { email, password } = loginInfo;
 
 	const onChange = e =>
-		setLoginInfo({ ...login, [e.target.name]: e.target.value });
+		setLoginInfo({ ...loginInfo, [e.target.name]: e.target.value });
 	const onSubmit = e => {
 		e.preventDefault();
-
-		let me = null;
-		users.forEach(user => {
-			if (
-				user.username === login.username &&
-				user.password === login.password
-			) {
-				me = user;
-			}
-		});
-		if (!!me) {
-			login.errors = `Successfully logged in as ${login.username}`;
-			setLoginInfo({ ...login, visibility: "visible" });
-
-			const viewableLeads =
-				me.usergroup === "exec"
-					? data.leads
-					: data.leads.filter(lead => {
-							return lead.agent === me.username;
-					  });
-			setUser({ ...me, myLeads: viewableLeads });
-			return <Redirect to="/" />;
-		} else {
-			login.errors = "Username or password is incorrect";
-			setLoginInfo({ ...login, visibility: "visible" });
-		}
-		console.log("User ", me);
+		// logIn({
+		// 	variables: { email, password }
+		// });
+		client.writeData({ data: { user: { name: "Hi", role: "Bob" } } });
+		console.log("Mutating...");
 	};
 	return (
 		<div style={styles.mainDiv}>
@@ -92,14 +129,14 @@ const LogIn = props => {
 				<h2>Login</h2>
 				<div>
 					<div style={{ ...styles.elementSize, ...styles.errors }}>
-						{login.errors}
+						{loginInfo.errors}
 					</div>
 					<input
 						style={styles.elementSize}
-						type="text"
-						placeholder="Please enter your username"
-						name="username"
-						value={username}
+						type="email"
+						placeholder="Please enter your email"
+						name="email"
+						value={email}
 						onChange={onChange}
 					/>
 				</div>
@@ -117,11 +154,14 @@ const LogIn = props => {
 					<button
 						style={{ ...styles.elementSize, ...styles.button }}
 						onClick={onSubmit}
+						disabled={loading}
 					>
 						Log In
 					</button>
 				</div>
 			</form>
+			<h3>User name: {localUserData.name}</h3>
+			<h3>User name: {localUserData.email}</h3>
 		</div>
 	);
 };

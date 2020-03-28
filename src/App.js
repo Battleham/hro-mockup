@@ -1,212 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
-import Layout from "./components/Layout";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
-import {
-	BrowserRouter as Router,
-	Route,
-	Switch,
-	Redirect
-} from "react-router-dom";
-import Dashboard from "./components/pages/Dashboard";
 import Login from "./components/pages/LogIn";
-import Leads from "./components/pages/Leads";
-import Users from "./components/pages/Users";
-import ApolloClient from "apollo-boost";
+import Pages from "./components/pages/Pages";
+import { resolvers } from "./resolvers";
+import { typeDefs } from "./typeDefs";
+
+import ApolloClient, { InMemoryCache } from "apollo-boost";
 import gql from "graphql-tag";
+import { ApolloProvider, useQuery } from "@apollo/react-hooks";
+
+const cache = new InMemoryCache({});
 
 const apolloClient = new ApolloClient({
-	uri: "http://134.122.22.200/graphql"
-});
-
-const roleId = 2;
-
-apolloClient
-	.query({
-		query: gql`
-			query {
-				role(id: ${roleId}) {
-					name
-					description
-					permissions {
-						name
-						description
-					}
-				}
-			}
-		`
-	})
-	.then(result => console.log(result));
-
-const theme = createMuiTheme({
-	palette: {
-		type: "dark",
-		background: {
-			default: "#303030",
-			paper: "#545454"
-		}
+	uri: "http://134.122.22.200/graphql",
+	cache: cache,
+	clientState: {
+		defaults: {
+			user: { name: "None", role: "None", permissions: [] },
+			__typename: "LocalUser"
+		},
+		resolvers: resolvers,
+		typeDefs: typeDefs
 	}
 });
 
-const mockData = {
-	users: [
-		{
-			fullName: "Venessa Kiyoko",
-			username: "venessa",
-			password: "1234",
-			usergroup: "exec"
-		},
-		{
-			fullName: "Meghan Borges",
-			username: "meghan",
-			password: "1234",
-			usergroup: "admin"
-		},
-		{
-			fullName: "Lillian Lang",
-			username: "lillian",
-			password: "1234",
-			usergroup: "admin"
+// apolloClient
+// 	.query({
+// 		query: gql`
+// 			query {
+// 				role(id: ${roleId}) {
+// 					name
+// 					description
+// 					permissions {
+// 						name
+// 						description
+// 					}
+// 				}
+// 			}
+// 		`
+// 	})
+// 	.then(result => console.log(result));
+
+const getLoggedInUser = gql`
+	query LoggedInUser {
+		user @client {
+			name
+			email
+			permissions {
+				name
+			}
 		}
-	],
-	leads: [
-		{
-			name: "Clark Kent",
-			phone: "123-456-7890",
-			type: "b2c",
-			email: "clarkkent@gmail.com",
-			assigned: true,
-			agent: "meghan",
-			source: "twitter",
-			date: "11-01-2019"
-		},
-		{
-			name: "Louis Lane",
-			phone: "123-456-7890",
-			type: "b2c",
-			email: "louis@gmail.com",
-			assigned: true,
-			agent: "meghan",
-			source: "facebook",
-			date: "11-08-2019"
-		},
-		{
-			name: "Bruce Wayne",
-			phone: "123-456-7890",
-			type: "b2c",
-			email: "darkknight@gmail.com",
-			assigned: true,
-			agent: "lillian",
-			source: "instagram",
-			date: "11-03-2019"
-		},
-		{
-			name: "The Joker",
-			phone: "123-456-7890",
-			type: "b2c",
-			email: "jokesonyou@gmail.com",
-			assigned: false,
-			source: "linkedin",
-			date: "11-05-2019"
-		},
-		{
-			name: "The Penguin",
-			phone: "123-456-7890",
-			type: "b2c",
-			email: "tuxedoallthetime@gmail.com",
-			assigned: false,
-			source: "website",
-			date: "11-11-2019"
-		},
-		{
-			name: "Global News 1",
-			phone: "123-456-7890",
-			type: "b2b",
-			email: "info@globalnews.com",
-			assigned: false,
-			source: "call in",
-			date: "11-04-2019"
-		},
-		{
-			name: "Daily Planet",
-			phone: "123-456-7890",
-			type: "b2b",
-			email: "contact@dailyplanet.com",
-			assigned: true,
-			agent: "venessa",
-			source: "referral",
-			date: "11-12-2019"
-		}
-	]
+	}
+`;
+
+const IsUserLoggedIn = () => {
+	const { data } = useQuery(getLoggedInUser);
+	useEffect(() => {
+		console.log("Cache:", data);
+	}, [data]);
+	console.log(data);
+	return data.user ? <Pages /> : <Login />;
 };
 
 function App() {
-	const [pageName, setPageName] = useState("Home");
-	const [loggedInUser, setUser] = useState(null);
+	//const [loggedInUser, setUser] = useState(null);
 	return (
-		<div>
-			{!loggedInUser ? (
-				<Login setPageName={setPageName} setUser={setUser} data={mockData} />
-			) : (
-				<Router>
-					<ThemeProvider theme={theme}>
-						<Layout
-							pageName={pageName}
-							user={loggedInUser}
-							setUser={setUser}
-							data={mockData}
-						>
-							<Switch>
-								<Route
-									exact
-									path="/"
-									render={props => (
-										<Dashboard
-											{...props}
-											setPageName={setPageName}
-											user={loggedInUser}
-											data={mockData}
-										/>
-									)}
-								/>
-								<Route
-									exact
-									path="/leads"
-									render={props => (
-										<Leads
-											{...props}
-											setPageName={setPageName}
-											user={loggedInUser}
-										/>
-									)}
-								/>
-								<Route
-									exact
-									path="/users"
-									render={props => (
-										<Users
-											{...props}
-											setPageName={setPageName}
-											user={loggedInUser}
-											users={mockData.users}
-										/>
-									)}
-								/>
-								<Route
-									exact
-									path="/logout"
-									render={props => {
-										setUser(null);
-										return <Redirect to="/" />;
-									}}
-								/>
-								<Redirect from="/login" to="/" />
-							</Switch>
-						</Layout>
-					</ThemeProvider>
-				</Router>
-			)}
-		</div>
+		<ApolloProvider client={apolloClient}>
+			<IsUserLoggedIn />
+		</ApolloProvider>
 	);
 }
 
