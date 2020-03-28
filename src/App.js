@@ -16,8 +16,14 @@ const apolloClient = new ApolloClient({
 	cache: cache,
 	clientState: {
 		defaults: {
-			user: { name: "None", role: "None", permissions: [] },
-			__typename: "LocalUser"
+			user: {
+				name: "None",
+				email: "asdf",
+				role: "None",
+				permissions: [],
+				__typename: "LocalUser"
+			},
+			loggedIn: false
 		},
 		resolvers: resolvers,
 		typeDefs: typeDefs
@@ -41,15 +47,17 @@ const apolloClient = new ApolloClient({
 // 	})
 // 	.then(result => console.log(result));
 
-const getLoggedInUser = gql`
+export const getLoggedInUser = gql`
 	query LoggedInUser {
 		user @client {
 			name
 			email
+			role
 			permissions {
 				name
 			}
 		}
+		loggedIn @client
 	}
 `;
 
@@ -59,7 +67,18 @@ const IsUserLoggedIn = () => {
 		console.log("Cache:", data);
 	}, [data]);
 	console.log(data);
-	return data.user ? <Pages /> : <Login />;
+	return data.loggedIn ? (
+		<Pages />
+	) : (
+		<div>
+			<div>
+				<h3>Name: {data.user.name}</h3>
+				<h3>Email: {data.user.email}</h3>
+				<h3>Role: {data.user.role}</h3>
+			</div>
+			<Login />
+		</div>
+	);
 };
 
 function App() {

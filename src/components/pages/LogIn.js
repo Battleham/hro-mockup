@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useMutation, useQuery, useApolloClient } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { Redirect } from "react-router-dom";
+import { getLoggedInUser } from "../../App";
 
 const LOG_IN = gql`
 	mutation LogIn($email: String!, $password: String!) {
@@ -25,21 +26,7 @@ const ADD_LOCAL_USER = gql`
 	}
 `;
 
-const getLoggedInUser = gql`
-	query LoggedInUser {
-		user @client {
-			name
-			email
-			permissions {
-				name
-			}
-		}
-	}
-`;
-
 const LogIn = () => {
-	const client = useApolloClient();
-
 	const [loginInfo, setLoginInfo] = useState({
 		email: "",
 		password: "",
@@ -50,26 +37,25 @@ const LogIn = () => {
 
 	const [logIn, { data, loading, error, called }] = useMutation(LOG_IN);
 	const [addLocalUser] = useMutation(ADD_LOCAL_USER);
-	const { data: localUserData } = useQuery(getLoggedInUser);
 
-	// if (called && !loading && data && !loginInfo.loggedIn) {
-	// 	if (data.login) {
-	// 		setLoginInfo({ ...loginInfo, loggedIn: true });
-	// 		const { name, email: userEmail, role, permissions } = data.login;
-	// 		let user = {
-	// 			name,
-	// 			email: userEmail,
-	// 			role: role.name,
-	// 			permissions: permissions.map(p => p.name),
-	// 			__typename: "LocalUser"
-	// 		};
-	// 		console.log(user);
-	// 		addLocalUser({ variables: { user } });
-	// 	}
-	// }
-	// if (error) {
-	// 	console.log(error);
-	// }
+	if (called && !loading && data && !loginInfo.loggedIn) {
+		if (data.login) {
+			setLoginInfo({ ...loginInfo, loggedIn: true });
+			const { name, email: userEmail, role, permissions } = data.login;
+			let user = {
+				name,
+				email: userEmail,
+				role: role.name,
+				permissions: permissions,
+				__typename: "LocalUser"
+			};
+			console.log(user);
+			addLocalUser({ variables: { user } });
+		}
+	}
+	if (error) {
+		console.log(error);
+	}
 
 	const styles = {
 		elementSize: {
@@ -117,10 +103,9 @@ const LogIn = () => {
 		setLoginInfo({ ...loginInfo, [e.target.name]: e.target.value });
 	const onSubmit = e => {
 		e.preventDefault();
-		// logIn({
-		// 	variables: { email, password }
-		// });
-		client.writeData({ data: { user: { name: "Hi", role: "Bob" } } });
+		logIn({
+			variables: { email, password }
+		});
 		console.log("Mutating...");
 	};
 	return (
@@ -160,8 +145,6 @@ const LogIn = () => {
 					</button>
 				</div>
 			</form>
-			<h3>User name: {localUserData.name}</h3>
-			<h3>User name: {localUserData.email}</h3>
 		</div>
 	);
 };
