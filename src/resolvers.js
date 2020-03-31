@@ -13,8 +13,8 @@ export const resolvers = {
 						role: user.role,
 						permissions: user.permissions,
 						__typename: "LocalUser"
-					},
-					loggedIn: true
+					}
+					//loggedIn: true
 				}
 			});
 			// cache.writeData({

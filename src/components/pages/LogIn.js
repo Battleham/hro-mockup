@@ -1,13 +1,26 @@
 import React, { useState } from "react";
 //import { Redirect } from "react-router-dom";
-import { useMutation, useQuery, useApolloClient } from "@apollo/react-hooks";
+import { useMutation, useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
-import { Redirect } from "react-router-dom";
-import { getLoggedInUser } from "../../App";
 
 const LOG_IN = gql`
 	mutation LogIn($email: String!, $password: String!) {
 		login(email: $email, password: $password) {
+			name
+			email
+			role {
+				name
+			}
+			permissions {
+				name
+			}
+		}
+	}
+`;
+
+const ME_QUERY = gql`
+	query me {
+		me {
 			name
 			email
 			role {
@@ -26,6 +39,18 @@ const ADD_LOCAL_USER = gql`
 	}
 `;
 
+const convertUserData = data => {
+	const { name, email, role, permissions } = data;
+	let user = {
+		name,
+		email,
+		role: role.name,
+		permissions: permissions,
+		__typename: "LocalUser"
+	};
+	return user;
+};
+
 const LogIn = () => {
 	const [loginInfo, setLoginInfo] = useState({
 		email: "",
@@ -37,20 +62,23 @@ const LogIn = () => {
 
 	const [logIn, { data, loading, error, called }] = useMutation(LOG_IN);
 	const [addLocalUser] = useMutation(ADD_LOCAL_USER);
+	const { data: meData, loading: meLoading } = useQuery(ME_QUERY);
+	if (meLoading) return <p>loading...</p>;
 
+	if (!meLoading && !loginInfo.loggedIn) {
+		console.log("Me: ", meData);
+		if (meData.me) {
+			setLoginInfo({ ...loginInfo, loggedIn: true });
+			addLocalUser({ variables: { user: convertUserData(meData.me) } });
+		}
+	}
+
+	//After the user hits the login button and apollo receives the data back
+	//Add user data to apollo local storage
 	if (called && !loading && data && !loginInfo.loggedIn) {
 		if (data.login) {
 			setLoginInfo({ ...loginInfo, loggedIn: true });
-			const { name, email: userEmail, role, permissions } = data.login;
-			let user = {
-				name,
-				email: userEmail,
-				role: role.name,
-				permissions: permissions,
-				__typename: "LocalUser"
-			};
-			console.log(user);
-			addLocalUser({ variables: { user } });
+			addLocalUser({ variables: { user: convertUserData(data.login) } });
 		}
 	}
 	if (error) {

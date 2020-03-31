@@ -10,10 +10,14 @@ import gql from "graphql-tag";
 import { ApolloProvider, useQuery } from "@apollo/react-hooks";
 
 const cache = new InMemoryCache({});
-
+const gqlUrl = "/graphql";
 const apolloClient = new ApolloClient({
-	uri: "http://134.122.22.200/graphql",
+	uri: gqlUrl,
 	cache: cache,
+	credentials: "include",
+	fetchOptions: {
+		credentials: "include"
+	},
 	clientState: {
 		defaults: {
 			user: {
@@ -66,7 +70,6 @@ const IsUserLoggedIn = () => {
 	useEffect(() => {
 		console.log("Cache:", data);
 	}, [data]);
-	console.log(data);
 	return data.loggedIn ? (
 		<Pages />
 	) : (
