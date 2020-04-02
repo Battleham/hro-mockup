@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "./App.css";
 import Login from "./components/pages/LogIn";
 import Pages from "./components/pages/Pages";
@@ -49,10 +49,9 @@ export const getLoggedInUser = gql`
 `;
 
 const IsUserLoggedIn = () => {
-	const { data } = useQuery(getLoggedInUser);
-	useEffect(() => {
-		console.log("Cache:", data);
-	}, [data]);
+	const { data, loading } = useQuery(getLoggedInUser);
+	if (loading) return <p>Loading...</p>;
+	console.log("Cache:", data);
 	return data.loggedIn ? (
 		<Pages user={data.user} />
 	) : (

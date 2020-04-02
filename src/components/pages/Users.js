@@ -7,6 +7,30 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+const USERS_QUERY = gql`
+	query getUsers {
+		users {
+			id
+			name
+			email
+			role {
+				name
+			}
+		}
+		user @client {
+			name
+			email
+			role
+			permissions {
+				name
+			}
+		}
+		loggedIn @client
+	}
+`;
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -23,10 +47,14 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 const Users = props => {
-	const { user, users, setPageName } = props;
+	const { setPageName } = props;
 	const classes = useStyles();
 	setPageName("Users");
-	if (user.usergroup !== "exec") {
+	const { data, loading } = useQuery(USERS_QUERY);
+	if (loading) return <p>Loading...</p>;
+	let { users, user } = data;
+	console.log(data);
+	if (user.role !== "Executive") {
 		return <Redirect to="/" />;
 	} else {
 		return (
@@ -40,18 +68,18 @@ const Users = props => {
 						<TableHead>
 							<TableRow>
 								<TableCell>Full Name</TableCell>
-								<TableCell align="right">Username</TableCell>
+								<TableCell align="center">Email</TableCell>
 								<TableCell align="right">User Group</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{users.map(user => (
-								<TableRow key={user.username}>
+							{users.map(u => (
+								<TableRow key={u.id}>
 									<TableCell component="th" scope="row">
-										{user.fullName}
+										{u.name}
 									</TableCell>
-									<TableCell align="right">{user.username}</TableCell>
-									<TableCell align="right">{user.usergroup}</TableCell>
+									<TableCell align="center">{u.email}</TableCell>
+									<TableCell align="right">{u.role.name}</TableCell>
 								</TableRow>
 							))}
 						</TableBody>

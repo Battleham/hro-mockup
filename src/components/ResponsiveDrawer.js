@@ -99,11 +99,9 @@ function ResponsiveDrawer(props) {
 	const handleDrawerToggle = () => {
 		setMobileOpen(!mobileOpen);
 	};
-	const navigate = e => {
-		console.log("navigating to...", e.target.value);
-		console.log("navigating to...", e.target);
+	const navigate = path => {
 		setMobileOpen(false);
-		history.push(e.target.value);
+		history.push(path);
 	};
 
 	const drawer = (
@@ -123,8 +121,7 @@ function ResponsiveDrawer(props) {
 					dense
 					button
 					onClick={() => {
-						setMobileOpen(false);
-						return <Redirect to="/" />;
+						navigate("/");
 					}}
 					selected={location.pathname === "/"}
 					ContainerComponent="li"
@@ -138,8 +135,7 @@ function ResponsiveDrawer(props) {
 					dense
 					button
 					onClick={() => {
-						setMobileOpen(false);
-						history.push("/leads");
+						navigate("/leads");
 					}}
 					selected={location.pathname === "/leads"}
 				>
@@ -155,7 +151,9 @@ function ResponsiveDrawer(props) {
 						value={"/users"}
 						button
 						dense
-						onClick={navigate}
+						onClick={() => {
+							navigate("/users");
+						}}
 						selected={location.pathname === "/users"}
 					>
 						<ListItemIcon>
