@@ -65,7 +65,7 @@ const LogIn = () => {
 	const { data: meData, loading: meLoading } = useQuery(ME_QUERY);
 	if (meLoading) return <p>loading...</p>;
 
-	if (!meLoading && !loginInfo.loggedIn) {
+	if (!meLoading && !loginInfo.loggedIn && meData) {
 		console.log("Me: ", meData);
 		if (meData.me) {
 			setLoginInfo({ ...loginInfo, loggedIn: true });

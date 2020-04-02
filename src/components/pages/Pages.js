@@ -25,12 +25,12 @@ const theme = createMuiTheme({
 	}
 });
 
-function Pages() {
+function Pages({ user }) {
 	const [pageName, setPageName] = useState("Home");
 	return (
 		<Router>
 			<ThemeProvider theme={theme}>
-				<Layout pageName={pageName}>
+				<Layout pageName={pageName} user={user}>
 					<Switch>
 						<Route
 							exact

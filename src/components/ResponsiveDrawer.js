@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Redirect, useLocation } from "react-router-dom";
+import { Link, Redirect, useLocation, useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -89,6 +89,7 @@ function ResponsiveDrawer(props) {
 	const classes = useStyles();
 	const theme = useTheme();
 	const location = useLocation();
+	let history = useHistory();
 	const [mobileOpen, setMobileOpen] = React.useState(false);
 
 	const logOut = () => {
@@ -97,6 +98,12 @@ function ResponsiveDrawer(props) {
 	};
 	const handleDrawerToggle = () => {
 		setMobileOpen(!mobileOpen);
+	};
+	const navigate = e => {
+		console.log("navigating to...", e.target.value);
+		console.log("navigating to...", e.target);
+		setMobileOpen(false);
+		history.push(e.target.value);
 	};
 
 	const drawer = (
@@ -115,8 +122,10 @@ function ResponsiveDrawer(props) {
 				<StyledListItem
 					dense
 					button
-					onClick={() => setMobileOpen(false)}
-					component={props => <Link to="/" {...props} />}
+					onClick={() => {
+						setMobileOpen(false);
+						return <Redirect to="/" />;
+					}}
 					selected={location.pathname === "/"}
 					ContainerComponent="li"
 				>
@@ -128,8 +137,10 @@ function ResponsiveDrawer(props) {
 				<StyledListItem
 					dense
 					button
-					onClick={() => setMobileOpen(false)}
-					component={props => <Link to="/leads" {...props} />}
+					onClick={() => {
+						setMobileOpen(false);
+						history.push("/leads");
+					}}
 					selected={location.pathname === "/leads"}
 				>
 					<ListItemIcon style={{ color: "inherit" }}>
@@ -138,12 +149,13 @@ function ResponsiveDrawer(props) {
 					<ListItemText primary="Leads" />
 				</StyledListItem>
 			</List>
-			{props.user.usergroup === "exec" ? (
+			{props.user.role === "Executive" ? (
 				<List>
 					<StyledListItem
+						value={"/users"}
 						button
-						onClick={() => setMobileOpen(false)}
-						component={props => <Link to="/users" {...props} />}
+						dense
+						onClick={navigate}
 						selected={location.pathname === "/users"}
 					>
 						<ListItemIcon>

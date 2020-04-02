@@ -1,5 +1,4 @@
 import React from "react";
-import Lead from "../Lead";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -7,6 +6,29 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import Utils from "../../utils";
+
+import { useQuery } from "@apollo/react-hooks";
+import { gql } from "apollo-boost";
+
+const MY_LEADS_QUERY = gql`
+	query myContacts {
+		myContacts {
+			id
+			name
+			email
+			phone
+			source
+			life_stage {
+				name
+			}
+			user {
+				name
+			}
+			created_at
+		}
+	}
+`;
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -23,11 +45,13 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const Leads = props => {
-	const { setPageName, user } = props;
+const Leads = ({ setPageName }) => {
 	setPageName("Leads");
 	const classes = useStyles();
-	console.log("Leads: ", user.myLeads);
+	const { data, loading } = useQuery(MY_LEADS_QUERY);
+	if (loading) return <p>Loading...</p>;
+	const myContacts = data ? data.myContacts : null;
+
 	return (
 		<div className={classes.root}>
 			<Paper className={classes.paper}>
@@ -39,30 +63,31 @@ const Leads = props => {
 					<TableHead>
 						<TableRow>
 							<TableCell>Name</TableCell>
-							<TableCell align="right">Phone</TableCell>
-							<TableCell align="right">Type</TableCell>
-							<TableCell align="right">Email</TableCell>
-							<TableCell align="right">Agent</TableCell>
-							<TableCell align="right">Source</TableCell>
+							<TableCell align="center">Phone</TableCell>
+							{/* <TableCell align="right">Type</TableCell> */}
+							<TableCell align="center">Email</TableCell>
+							<TableCell align="center">Agent</TableCell>
+							<TableCell align="center">Source</TableCell>
 							<TableCell align="right">Date</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{user.myLeads.map(lead => (
-							<TableRow key={lead.name}>
+						{myContacts.map(lead => (
+							<TableRow key={lead.id}>
 								<TableCell component="th" scope="row">
 									{lead.name}
 								</TableCell>
-								<TableCell align="right">{lead.phone}</TableCell>
-								<TableCell align="right">{lead.type}</TableCell>
-								<TableCell align="right">{lead.email}</TableCell>
-								{lead.assigned ? (
-									<TableCell align="right">{lead.agent}</TableCell>
+								<TableCell align="center">{lead.phone}</TableCell>
+								<TableCell align="center">{lead.email}</TableCell>
+								{lead.user ? (
+									<TableCell align="center">{lead.user.name}</TableCell>
 								) : (
-									<TableCell align="right">Unassigned</TableCell>
+									<TableCell align="center">Unassigned</TableCell>
 								)}
-								<TableCell align="right">{lead.source}</TableCell>
-								<TableCell align="right">{lead.date}</TableCell>
+								<TableCell align="center">{lead.source}</TableCell>
+								<TableCell align="right">
+									{Utils.dateString(lead.created_at)}
+								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>

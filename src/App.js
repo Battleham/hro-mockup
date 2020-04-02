@@ -34,23 +34,6 @@ const apolloClient = new ApolloClient({
 	}
 });
 
-// apolloClient
-// 	.query({
-// 		query: gql`
-// 			query {
-// 				role(id: ${roleId}) {
-// 					name
-// 					description
-// 					permissions {
-// 						name
-// 						description
-// 					}
-// 				}
-// 			}
-// 		`
-// 	})
-// 	.then(result => console.log(result));
-
 export const getLoggedInUser = gql`
 	query LoggedInUser {
 		user @client {
@@ -71,7 +54,7 @@ const IsUserLoggedIn = () => {
 		console.log("Cache:", data);
 	}, [data]);
 	return data.loggedIn ? (
-		<Pages />
+		<Pages user={data.user} />
 	) : (
 		<div>
 			<div>
