@@ -19,6 +19,15 @@ import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import MenuBookIcon from "@material-ui/icons/MenuBook";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import InsertChartIcon from "@material-ui/icons/InsertChart";
+import { useMutation } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+const LOGOUT_QUERY = gql`
+	mutation logout {
+		logout
+		logout @client
+	}
+`;
 
 const drawerWidth = 240;
 
@@ -91,9 +100,10 @@ function ResponsiveDrawer(props) {
 	const location = useLocation();
 	let history = useHistory();
 	const [mobileOpen, setMobileOpen] = React.useState(false);
+	const [logoutFunction] = useMutation(LOGOUT_QUERY);
 
 	const logOut = () => {
-		props.setUser(null);
+		logoutFunction();
 		return <Redirect to="/" />;
 	};
 	const handleDrawerToggle = () => {

@@ -29,6 +29,23 @@ export const resolvers = {
 			// 	}
 			// });
 			return user;
+		},
+		logout(_, __, { cache }) {
+			document.cookie =
+				"sid=; expires = Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+			cache.writeQuery({
+				query: getLoggedInUser,
+				data: {
+					user: {
+						name: "",
+						email: "",
+						role: "",
+						permissions: [],
+						__typename: "LocalUser"
+					},
+					loggedIn: false
+				}
+			});
 		}
 	}
 };

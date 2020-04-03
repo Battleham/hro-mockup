@@ -62,6 +62,7 @@ const Leads = ({ setPageName }) => {
 				>
 					<TableHead>
 						<TableRow>
+							<TableCell>ID</TableCell>
 							<TableCell>Name</TableCell>
 							<TableCell align="center">Phone</TableCell>
 							{/* <TableCell align="right">Type</TableCell> */}
@@ -74,6 +75,7 @@ const Leads = ({ setPageName }) => {
 					<TableBody>
 						{myContacts.map(lead => (
 							<TableRow key={lead.id}>
+								<TableCell>{lead.id}</TableCell>
 								<TableCell component="th" scope="row">
 									{lead.name}
 								</TableCell>

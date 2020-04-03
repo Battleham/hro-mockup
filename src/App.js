@@ -52,18 +52,7 @@ const IsUserLoggedIn = () => {
 	const { data, loading } = useQuery(getLoggedInUser);
 	if (loading) return <p>Loading...</p>;
 	console.log("Cache:", data);
-	return data.loggedIn ? (
-		<Pages user={data.user} />
-	) : (
-		<div>
-			<div>
-				<h3>Name: {data.user.name}</h3>
-				<h3>Email: {data.user.email}</h3>
-				<h3>Role: {data.user.role}</h3>
-			</div>
-			<Login />
-		</div>
-	);
+	return data.loggedIn ? <Pages user={data.user} /> : <Login />;
 };
 
 function App() {
